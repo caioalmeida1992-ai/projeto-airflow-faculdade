@@ -1,6 +1,8 @@
 version: '3'
 x-airflow-common: &airflow-common
-  build: .
+  x-airflow-common: &airflow-common
+  image: us-central1-docker.pkg.dev/projeto-viagens-471922/airflow-images/meu-airflow:latest
+  ...
   environment:
     - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     - AIRFLOW__CORE__LOAD_EXAMPLES=False
