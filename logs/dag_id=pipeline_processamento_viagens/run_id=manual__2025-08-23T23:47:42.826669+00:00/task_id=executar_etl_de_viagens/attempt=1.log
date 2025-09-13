@@ -1,0 +1,26 @@
+[2025-08-23T20:47:45.351-0300] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-08-23T20:47:45.372-0300] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: pipeline_processamento_viagens.executar_etl_de_viagens manual__2025-08-23T23:47:42.826669+00:00 [queued]>
+[2025-08-23T20:47:45.375-0300] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: pipeline_processamento_viagens.executar_etl_de_viagens manual__2025-08-23T23:47:42.826669+00:00 [queued]>
+[2025-08-23T20:47:45.375-0300] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2025-08-23T20:47:45.383-0300] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): executar_etl_de_viagens> on 2025-08-23 23:47:42.826669+00:00
+[2025-08-23T20:47:45.390-0300] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'pipeline_processamento_viagens', 'executar_etl_de_viagens', 'manual__2025-08-23T23:47:42.826669+00:00', '--job-id', '11', '--raw', '--subdir', 'DAGS_FOLDER/dag_processamento_viagens.py', '--cfg-path', '/tmp/tmpbw4spxpz']
+[2025-08-23T20:47:45.391-0300] {standard_task_runner.py:91} INFO - Job 11: Subtask executar_etl_de_viagens
+[2025-08-23T20:47:45.392-0300] {logging_mixin.py:188} WARNING - /home/caioa/Airflow/venv/lib/python3.12/site-packages/airflow/task/task_runner/standard_task_runner.py:61 DeprecationWarning: This process (pid=5011) is multi-threaded, use of fork() may lead to deadlocks in the child.
+[2025-08-23T20:47:45.392-0300] {standard_task_runner.py:63} INFO - Started process 5025 to run task
+[2025-08-23T20:47:45.416-0300] {task_command.py:426} INFO - Running <TaskInstance: pipeline_processamento_viagens.executar_etl_de_viagens manual__2025-08-23T23:47:42.826669+00:00 [running]> on host PCzo.localdomain
+[2025-08-23T20:47:45.452-0300] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='pipeline_processamento_viagens' AIRFLOW_CTX_TASK_ID='executar_etl_de_viagens' AIRFLOW_CTX_EXECUTION_DATE='2025-08-23T23:47:42.826669+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-08-23T23:47:42.826669+00:00'
+[2025-08-23T20:47:45.453-0300] {taskinstance.py:430} INFO - ::endgroup::
+[2025-08-23T20:47:45.465-0300] {logging_mixin.py:188} INFO - --- Iniciando Pipeline de ETL de Viagens ---
+[2025-08-23T20:47:45.466-0300] {logging_mixin.py:188} INFO - Extraindo dados de /home/caioa/Airflow/data/novas_avaliacoes.csv...
+[2025-08-23T20:47:45.470-0300] {logging_mixin.py:188} INFO - Iniciando transformação dos dados...
+[2025-08-23T20:47:45.481-0300] {logging_mixin.py:188} INFO - Transformação concluída.
+[2025-08-23T20:47:45.481-0300] {logging_mixin.py:188} INFO - Conectando ao MongoDB em mongodb://10.255.255.254/...
+[2025-08-23T20:47:50.496-0300] {logging_mixin.py:188} INFO - ERRO: Não foi possível conectar ou inserir dados no MongoDB. Verifique se ele está rodando no Windows. Erro: 10.255.255.254:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 5.0s, Topology Description: <TopologyDescription id: 68aa5321c5564bc777655cfa, topology_type: Unknown, servers: [<ServerDescription ('10.255.255.254', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('10.255.255.254:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+[2025-08-23T20:47:50.497-0300] {logging_mixin.py:188} INFO - Arquivo movido para /home/caioa/Airflow/data/arquivados/20250823_204750_novas_avaliacoes.csv
+[2025-08-23T20:47:50.497-0300] {logging_mixin.py:188} INFO - --- Pipeline de ETL de Viagens Concluído ---
+[2025-08-23T20:47:50.497-0300] {python.py:237} INFO - Done. Returned value was: None
+[2025-08-23T20:47:50.498-0300] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-08-23T20:47:50.500-0300] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=pipeline_processamento_viagens, task_id=executar_etl_de_viagens, run_id=manual__2025-08-23T23:47:42.826669+00:00, execution_date=20250823T234742, start_date=20250823T234745, end_date=20250823T234750
+[2025-08-23T20:47:50.517-0300] {local_task_job_runner.py:240} INFO - Task exited with return code 0
+[2025-08-23T20:47:50.523-0300] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-08-23T20:47:50.524-0300] {local_task_job_runner.py:222} INFO - ::endgroup::

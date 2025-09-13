@@ -1,0 +1,6 @@
+streamlit
+pandas
+pymongo[srv]
+gcsfs
+plotly
+apache-airflow-providers-google
