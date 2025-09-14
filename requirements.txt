@@ -1,7 +1,7 @@
-streamlit==1.38.0
-pandas==2.1.4
-pymongo[srv]==4.6.3
-gcsfs==2024.6.0
-plotly==5.22.0
-apache-airflow-providers-google==10.15.0
-apache-airflow-providers-mongo==4.2.0
+streamlit
+pandas
+pymongo[srv]
+gcsfs
+plotly
+apache-airflow-providers-google
+apache-airflow-providers-mongo
