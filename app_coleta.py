@@ -1,74 +1,44 @@
 import streamlit as st
 import pandas as pd
-import os
 from datetime import datetime
 from google.cloud import storage
 import json
+import os
 
-# --- Configuração da Página ---
 st.set_page_config(page_title="Coleta de Avaliação", layout="centered")
 st.title("📝 Formulário de Avaliação de Viagem")
-st.write("Sua avaliação nos ajudará a recomendar suas próximas viagens!")
-st.markdown("---")
 
-# --- Configuração do Google Cloud Storage (MODIFICADO) ---
-# Em nosso ambiente Docker, as credenciais são lidas automaticamente
-# a partir do arquivo apontado pela variável de ambiente GOOGLE_APPLICATION_CREDENTIALS.
+# Configuração do GCS
 try:
-    storage_client = storage.Client()
-    # O nome do bucket é lido de um arquivo para não ser exposto no código.
+    # Para rodar localmente no Docker, as credenciais vêm do arquivo montado
+    storage_client = storage.Client.from_service_account_json("gcp-credentials.json")
     with open("gcs_bucket_name.txt", "r") as f:
         BUCKET_NAME = f.read().strip()
 except Exception as e:
-    st.error(f"Erro ao configurar o acesso ao Google Cloud Storage. Verifique os arquivos gcp-credentials.json e gcs_bucket_name.txt na VM. Erro: {e}")
+    st.error(f"Erro ao configurar o GCS: {e}")
     storage_client = None
-    BUCKET_NAME = None
 
-# --- Formulário de Coleta ---
+# ... (resto do formulário igual ao que você já tem) ...
+# Lembre-se de adicionar todos os campos do formulário aqui
 with st.form("avaliacao_form", clear_on_submit=True):
-    st.subheader("Detalhes da Viagem")
-    id_cliente = st.text_input("Seu ID de Cliente", help="Insira seu identificador único (ex: cliente123).")
-    destino = st.text_input("Destino da Viagem", placeholder="Ex: Salvador, BA")
-    col1, col2 = st.columns(2)
-    with col1:
-        data_inicio = st.date_input("Data de Início", value=datetime.today(), max_value=datetime.today())
-    with col2:
-        data_fim = st.date_input("Data de Fim", value=datetime.today(), max_value=datetime.today())
-
-    st.subheader("Sua Avaliação")
+    id_cliente = st.text_input("Seu ID de Cliente")
+    destino = st.text_input("Destino da Viagem")
+    data_inicio = st.date_input("Data de Início")
+    data_fim = st.date_input("Data de Fim")
     nota_experiencia = st.slider("Nota para a Experiência Geral (0-5)", 0, 5, 3)
     nota_destino = st.slider("Nota para o Destino Visitado (0-5)", 0, 5, 3)
-
     submitted = st.form_submit_button("✔️ Enviar Avaliação")
 
-# --- Lógica de Processamento ao Enviar ---
 if submitted and storage_client:
-    if not id_cliente or not destino:
-        st.error("Por favor, preencha os campos 'ID do Cliente' e 'Destino'.")
-    elif data_fim < data_inicio:
-        st.error("A 'Data de Fim' não pode ser anterior à 'Data de Início'.")
-    else:
-        nova_avaliacao = {
-            'id_cliente': [id_cliente],
-            'destino': [destino],
-            'data_inicio': [data_inicio.strftime('%Y-%m-%d')],
-            'data_fim': [data_fim.strftime('%Y-%m-%d')],
-            'nota_experiencia': [nota_experiencia],
-            'nota_destino': [nota_destino]
-        }
-        df_nova_avaliacao = pd.DataFrame(nova_avaliacao)
+    # ... (lógica para criar o DataFrame é a mesma) ...
+    nova_avaliacao = {'id_cliente': [id_cliente], 'destino': [destino], 'data_inicio': [data_inicio.strftime('%Y-%m-%d')], 'data_fim': [data_fim.strftime('%Y-%m-%d')], 'nota_experiencia': [nota_experiencia], 'nota_destino': [nota_destino]}
+    df_nova_avaliacao = pd.DataFrame(nova_avaliacao)
+    csv_string = df_nova_avaliacao.to_csv(index=False)
 
-        # Converte o DataFrame para CSV em formato de string
-        csv_string = df_nova_avaliacao.to_csv(index=False)
-
-        # Define o nome do arquivo no bucket
-        file_name = "novas_avaliacoes.csv"
-
-        try:
-            # Faz o upload do arquivo para o GCS
-            bucket = storage_client.bucket(BUCKET_NAME)
-            blob = bucket.blob(file_name)
-            blob.upload_from_string(csv_string, 'text/csv')
-            st.success(f"✅ Avaliação enviada com sucesso! O pipeline do Airflow irá processá-la em breve.")
-        except Exception as e:
-            st.error(f"Falha ao enviar avaliação para o servidor. Tente novamente. Erro: {e}")
+    try:
+        bucket = storage_client.bucket(BUCKET_NAME)
+        blob = bucket.blob("novas_avaliacoes.csv")
+        blob.upload_from_string(csv_string, 'text/csv')
+        st.success(f"✅ Avaliação enviada! O pipeline irá processá-la.")
+    except Exception as e:
+        st.error(f"Falha ao enviar avaliação: {e}")

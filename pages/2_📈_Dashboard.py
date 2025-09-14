@@ -2,16 +2,19 @@ import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
 import plotly.express as px
+from google.cloud import storage
+import json
 
+# --- Configuração da Página ---
 st.set_page_config(page_title="Dashboard de Recomendações", layout="wide")
 st.title("📈 Dashboard de Análise e Recomendações")
 
-# --- Conexão com o MongoDB Atlas (MODIFICADO) ---
-# Em nosso ambiente Docker, a string de conexão é lida de um arquivo.
+# --- Conexão Segura com o MongoDB Atlas ---
 @st.cache_data
 def load_data_from_mongo():
+    """Conecta no MongoDB e carrega os dados da coleção 'viagens'."""
     try:
-        # Lê a string de conexão do arquivo de texto
+        # Pega a string de conexão dos "Secrets" (que estarão no arquivo mongo_uri.txt na VM)
         with open("mongo_uri.txt", "r") as f:
             mongo_conn_string = f.read().strip()
         
@@ -62,7 +65,7 @@ if st.sidebar.button("🔄 Atualizar Dados"):
     st.rerun()
 
 if df.empty:
-    st.warning("Ainda não há dados de viagens no banco de dados. Envie algumas avaliações e aguarde o processamento.")
+    st.warning("Ainda não há dados de viagens no banco de dados. Envie algumas avaliações e aguarde o processamento do pipeline.")
 else:
     clientes = sorted(df['id_cliente'].unique())
     cliente_selecionado = st.sidebar.selectbox("Selecione um Cliente", clientes)
