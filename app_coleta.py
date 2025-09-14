@@ -1,5 +1,3 @@
-# Conteúdo ATUALIZADO para: app_coleta.py
-
 import streamlit as st
 import pandas as pd
 import os
@@ -13,15 +11,16 @@ st.title("📝 Formulário de Avaliação de Viagem")
 st.write("Sua avaliação nos ajudará a recomendar suas próximas viagens!")
 st.markdown("---")
 
-# --- Configuração do Google Cloud Storage ---
-# O Streamlit Community Cloud injeta os "Secrets" como variáveis de ambiente.
+# --- Configuração do Google Cloud Storage (MODIFICADO) ---
+# Em nosso ambiente Docker, as credenciais são lidas automaticamente
+# a partir do arquivo apontado pela variável de ambiente GOOGLE_APPLICATION_CREDENTIALS.
 try:
-    # Tenta carregar as credenciais do JSON armazenado no Streamlit Secrets
-    gcp_creds_dict = json.loads(st.secrets["gcp_service_account_json"])
-    storage_client = storage.Client.from_service_account_info(gcp_creds_dict)
-    BUCKET_NAME = st.secrets["gcs_bucket_name"]
+    storage_client = storage.Client()
+    # O nome do bucket é lido de um arquivo para não ser exposto no código.
+    with open("gcs_bucket_name.txt", "r") as f:
+        BUCKET_NAME = f.read().strip()
 except Exception as e:
-    st.error(f"Erro ao configurar o acesso ao Google Cloud Storage. Verifique os 'Secrets' do Streamlit. Erro: {e}")
+    st.error(f"Erro ao configurar o acesso ao Google Cloud Storage. Verifique os arquivos gcp-credentials.json e gcs_bucket_name.txt na VM. Erro: {e}")
     storage_client = None
     BUCKET_NAME = None
 

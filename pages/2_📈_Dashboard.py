@@ -1,5 +1,3 @@
-# Conteúdo ATUALIZADO para: pages/2_📈_Dashboard.py
-
 import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
@@ -8,12 +6,15 @@ import plotly.express as px
 st.set_page_config(page_title="Dashboard de Recomendações", layout="wide")
 st.title("📈 Dashboard de Análise e Recomendações")
 
-# --- Conexão Segura com o MongoDB Atlas usando Secrets ---
+# --- Conexão com o MongoDB Atlas (MODIFICADO) ---
+# Em nosso ambiente Docker, a string de conexão é lida de um arquivo.
 @st.cache_data
 def load_data_from_mongo():
     try:
-        # Pega a string de conexão dos "Secrets" do Streamlit
-        mongo_conn_string = st.secrets["mongo_conn_string"]
+        # Lê a string de conexão do arquivo de texto
+        with open("mongo_uri.txt", "r") as f:
+            mongo_conn_string = f.read().strip()
+        
         client = MongoClient(mongo_conn_string, serverSelectionTimeoutMS=5000)
         client.server_info()
         db = client["empresa_onibus"]
@@ -27,10 +28,12 @@ def load_data_from_mongo():
 
         return pd.DataFrame(data) if data else pd.DataFrame()
     except Exception as e:
-        st.error(f"Erro ao conectar com o MongoDB: {e}. Verifique os 'Secrets' do Streamlit.")
+        st.error(f"Erro ao conectar com o MongoDB: {e}. Verifique o arquivo mongo_uri.txt na VM.")
         return pd.DataFrame()
 
-# --- (As funções get_recommendations e predict_vacation_month continuam as mesmas) ---
+# --- (O restante do seu código de lógica e visualização continua exatamente o mesmo) ---
+
+# --- Lógica de Recomendação ---
 def get_recommendations(df_cliente, all_destinations):
     destinos_excluidos = df_cliente[df_cliente['nota_destino'] < 3]['destino'].tolist()
     destinos_favoritos = df_cliente[df_cliente['nota_destino'] >= 4]['destino'].tolist()
@@ -42,6 +45,7 @@ def get_recommendations(df_cliente, all_destinations):
     recomendacoes_finais = [rec for rec in recomendacoes if rec not in df_cliente['destino'].tolist() and rec not in destinos_excluidos]
     return recomendacoes_finais if recomendacoes_finais else ["Já recomendamos todos os destinos similares aos seus favoritos!"]
 
+# --- Lógica de Previsão de Férias ---
 def predict_vacation_month(df_cliente):
     df_ferias = df_cliente[df_cliente['periodo_ferias'] == True]
     if df_ferias.empty: return "Ainda não temos dados suficientes para prever seu período de férias."
