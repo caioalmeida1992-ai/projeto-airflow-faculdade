@@ -56,7 +56,7 @@ def run_etl():
     archive_file_name = f"arquivados/{timestamp}_{SOURCE_FILE_NAME}"
     print(f"Arquivando arquivo para gs://{BUCKET_NAME}/{archive_file_name}...")
     gcs_hook.copy(source_bucket=BUCKET_NAME, source_object=SOURCE_FILE_NAME,
-                  dest_bucket=BUCKET_NAME, dest_object=archive_file_name)
+                  destination_bucket=BUCKET_NAME, destination_object=archive_file_name)
     gcs_hook.delete(bucket_name=BUCKET_NAME, object_name=SOURCE_FILE_NAME)
     print("Arquivo arquivado com sucesso.")
     
